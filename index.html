@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediTrack — Medication Companion</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#17243b;--muted:#6c7890;--blue:#2864e8;--mint:#dff8ef;--line:#e6ebf3;--red:#d94d5c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:12px;padding:11px 15px;font-weight:650}
+.app{max-width:1120px;margin:auto;padding:24px}.top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:12px}.logo{display:grid;place-items:center;background:var(--blue);color:white;border-radius:15px;width:46px;height:46px;font-size:24px;font-weight:800}.brand h1{font-size:21px;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}.tag{background:var(--mint);color:#117b5c;border-radius:99px;padding:7px 11px;font-size:12px;font-weight:750}
+.hero{background:linear-gradient(120deg,#1e56d8,#4685f4);color:white;padding:28px;border-radius:24px;display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:20px}.hero h2{font-size:clamp(24px,4vw,34px);margin:0 0 8px}.hero p{margin:0;color:#e1eaff;max-width:540px}.datebox{text-align:right;min-width:125px}.datebox strong{display:block;font-size:26px}.datebox span{font-size:13px;color:#e1eaff}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}.stat,.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:19px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:27px;margin:7px 0 1px}.stat span{font-size:12px;color:var(--muted)}
+.layout{display:grid;grid-template-columns:1.3fr .9fr;gap:18px}.panel{margin-bottom:18px}.panelhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}.panel h3{margin:0;font-size:17px}.sub{font-size:12px;color:var(--muted);margin-top:4px}.primary{background:var(--blue);color:white}.secondary{background:#edf2ff;color:#244fb2}.soft{background:#f1f4f9;color:#3d4b62}.med{display:flex;align-items:center;gap:12px;border:1px solid var(--line);padding:13px;border-radius:15px;margin-top:10px}.pillicon{width:43px;height:43px;border-radius:13px;background:#eaf0ff;display:grid;place-items:center;font-size:22px}.medmain{flex:1;min-width:0}.medmain strong{display:block}.medmain small{color:var(--muted)}.medtime{text-align:right;font-size:12px;color:var(--muted)}.done{background:#e1f8ed;color:#117b5c;padding:8px 10px;border-radius:10px;font-size:12px}.taken{opacity:.65}.taken .medmain strong{text-decoration:line-through}.empty{padding:18px;text-align:center;color:var(--muted);border:1px dashed #cfd8e6;border-radius:14px}
+label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin:11px 0 5px}input,select{width:100%;padding:11px 12px;border:1px solid #dbe2ed;border-radius:11px;background:white;color:var(--ink)}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.formactions{display:flex;gap:8px;margin-top:14px}.formactions button{flex:1}.hidden{display:none}.symptomrow{display:flex;gap:9px;align-items:center;margin-top:10px}.symptomrow select{flex:1}.notice{background:#fff8e6;border:1px solid #f5e2a8;color:#765516;border-radius:14px;padding:13px;font-size:12px;margin-top:14px}.privacy{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:12px}.privacy b{color:var(--ink)}footer{text-align:center;color:var(--muted);font-size:12px;padding:12px}
+@media(max-width:760px){.app{padding:15px}.hero{padding:22px}.datebox{display:none}.layout{grid-template-columns:1fr}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:22px}.stats .stat span{font-size:11px}.top{align-items:flex-start}.tag{white-space:nowrap}.med{gap:8px}.medtime{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">+</div><div><h1>MediTrack</h1><p>Your medication companion</p></div></div>
+    <div class="tag">● Demo prototype</div>
+  </header>
+  <section class="hero">
+    <div><h2>A little reminder.<br>A healthier routine.</h2><p>Keep your medication schedule organized and record how you feel — all in one simple place.</p></div>
+    <div class="datebox"><strong id="todayDate">Today</strong><span id="todayDay">Your daily overview</span></div>
+  </section>
+  <section class="stats">
+    <div class="stat"><small>Today's schedule</small><strong id="scheduledCount">3</strong><span>medication reminders</span></div>
+    <div class="stat"><small>Completed today</small><strong id="takenCount">0</strong><span>marked as taken</span></div>
+    <div class="stat"><small>Daily progress</small><strong id="progress">0%</strong><span>of reminders completed</span></div>
+  </section>
+  <div class="layout">
+    <main>
+      <section class="panel">
+        <div class="panelhead"><div><h3>Today's medication</h3><div class="sub">Mark a dose after you take it.</div></div><button class="primary" id="showFormBtn">+ Add medicine</button></div>
+        <div id="medicineList"></div>
+        <div id="medicineForm" class="hidden">
+          <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+          <h3>Add a medicine</h3>
+          <form id="addMedicineForm">
+            <label for="medName">Medicine name</label><input id="medName" required placeholder="e.g. Vitamin D">
+            <div class="formgrid"><div><label for="medDose">Dose / instructions</label><input id="medDose" required placeholder="e.g. 1 tablet"></div><div><label for="medTime">Reminder time</label><input id="medTime" type="time" value="09:00" required></div></div>
+            <div class="formactions"><button type="button" class="soft" id="cancelFormBtn">Cancel</button><button class="primary" type="submit">Save medicine</button></div>
+          </form>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="panelhead"><div><h3>How are you feeling?</h3><div class="sub">Log a symptom for your own record.</div></div><span>🩺</span></div>
+        <form id="symptomForm">
+          <div class="formgrid"><div><label for="symptom">Symptom</label><select id="symptom"><option>Headache</option><option>Nausea</option><option>Fatigue</option><option>Dizziness</option><option>Feeling well</option><option>Other</option></select></div><div><label for="severity">Severity</label><select id="severity"><option>Mild</option><option>Moderate</option><option>Severe</option></select></div></div>
+          <label for="symptomNote">Note (optional)</label><input id="symptomNote" placeholder="Anything else you want to remember">
+          <div class="formactions"><button class="primary" type="submit">Save symptom log</button></div>
+        </form>
+        <div id="symptomLogs"></div>
+      </section>
+    </main>
+    <aside>
+      <section class="panel">
+        <div class="panelhead"><div><h3>Daily check-in</h3><div class="sub">Small habits make a difference.</div></div><span>💧</span></div>
+        <div class="med"><div class="pillicon">💧</div><div class="medmain"><strong>Drink water</strong><small>Stay hydrated through the day</small></div><button class="done" id="waterBtn">Done</button></div>
+        <div class="med"><div class="pillicon">🌿</div><div class="medmain"><strong>Take a mindful break</strong><small>Pause and check in with yourself</small></div><button class="done" id="breakBtn">Done</button></div>
+        <div class="notice"><b>Important:</b> MediTrack is a student demo, not a medical device. It does not recommend doses or replace advice from a doctor or pharmacist. Always follow your prescription.</div>
+      </section>
+      <section class="panel">
+        <div class="panelhead"><div><h3>Privacy by design</h3><div class="sub">Built with user trust in mind.</div></div><span>🔒</span></div>
+        <div class="privacy"><span>✓</span><div><b>Local demo storage</b><br>Entries stay in this browser using local storage. No account or server is used.</div></div>
+        <div class="privacy" style="margin-top:12px"><span>✓</span><div><b>Data minimization</b><br>Only the information needed for this prototype is collected.</div></div>
+        <div class="privacy" style="margin-top:12px"><span>✓</span><div><b>Clear limitations</b><br>This demo has no real notifications, cloud backup, or clinical AI.</div></div>
+        <button class="soft" style="width:100%;margin-top:16px" id="resetBtn">Reset demo data</button>
+      </section>
+    </aside>
+  </div>
+  <footer>MediTrack · AI in Medicine mid-term project · Educational prototype only</footer>
+</div>
+<script>
+const initialMeds=[
+ {id:1,name:"Vitamin D",dose:"1 tablet",time:"08:00",taken:false},
+ {id:2,name:"Prescribed medicine",dose:"As prescribed",time:"13:00",taken:false},
+ {id:3,name:"Evening medicine",dose:"As prescribed",time:"20:00",taken:false}
+];
+let meds=JSON.parse(localStorage.getItem("mt_meds")||"null")||initialMeds;
+let logs=JSON.parse(localStorage.getItem("mt_logs")||"[]");
+let habits=JSON.parse(localStorage.getItem("mt_habits")||"{}");
+const $=id=>document.getElementById(id);
+function persist(){localStorage.setItem("mt_meds",JSON.stringify(meds));localStorage.setItem("mt_logs",JSON.stringify(logs));localStorage.setItem("mt_habits",JSON.stringify(habits))}
+function render(){
+ const list=$("medicineList");
+ if(!meds.length) list.innerHTML='<div class="empty">No medicines added yet. Use “Add medicine” to create a reminder.</div>';
+ else list.innerHTML=[...meds].sort((a,b)=>a.time.localeCompare(b.time)).map(m=>`<div class="med ${m.taken?'taken':''}"><div class="pillicon">💊</div><div class="medmain"><strong>${escapeHTML(m.name)}</strong><small>${escapeHTML(m.dose)}</small></div><div class="medtime">${m.time}</div><button class="${m.taken?'soft':'done'}" onclick="toggleTaken(${m.id})">${m.taken?'Undo':'✓ Taken'}</button></div>`).join("");
+ const total=meds.length, taken=meds.filter(m=>m.taken).length;
+ $("scheduledCount").textContent=total;$("takenCount").textContent=taken;$("progress").textContent=(total?Math.round(taken/total*100):0)+"%";
+ $("symptomLogs").innerHTML=logs.slice(0,3).map(l=>`<div class="sub" style="padding:10px 0;border-top:1px solid var(--line)"><b>${escapeHTML(l.symptom)}</b> · ${escapeHTML(l.severity)} · ${escapeHTML(l.time)}${l.note?' — '+escapeHTML(l.note):''}</div>`).join("");
+ $("waterBtn").textContent=habits.water?'✓ Done':'Done';$("breakBtn").textContent=habits.break?'✓ Done':'Done';
+}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+window.toggleTaken=id=>{const m=meds.find(x=>x.id===id);if(m){m.taken=!m.taken;persist();render()}};
+$("showFormBtn").onclick=()=>{$("medicineForm").classList.remove("hidden");$("medName").focus()};
+$("cancelFormBtn").onclick=()=>{$("medicineForm").classList.add("hidden");$("addMedicineForm").reset()};
+$("addMedicineForm").onsubmit=e=>{e.preventDefault();meds.push({id:Date.now(),name:$("medName").value.trim(),dose:$("medDose").value.trim(),time:$("medTime").value,taken:false});persist();render();e.target.reset();$("medicineForm").classList.add("hidden")};
+$("symptomForm").onsubmit=e=>{e.preventDefault();logs.unshift({symptom:$("symptom").value,severity:$("severity").value,note:$("symptomNote").value.trim(),time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});persist();render();$("symptomNote").value=""};
+$("waterBtn").onclick=()=>{habits.water=!habits.water;persist();render()};$("breakBtn").onclick=()=>{habits.break=!habits.break;persist();render()};
+$("resetBtn").onclick=()=>{if(confirm("Reset all MediTrack demo data?")){localStorage.removeItem("mt_meds");localStorage.removeItem("mt_logs");localStorage.removeItem("mt_habits");meds=initialMeds.map(x=>({...x}));logs=[];habits={};persist();render()}};
+const now=new Date();$("todayDate").textContent=now.toLocaleDateString(undefined,{month:"short",day:"numeric"});$("todayDay").textContent=now.toLocaleDateString(undefined,{weekday:"long"});
+render();
+</script>
+</body>
+</html>
